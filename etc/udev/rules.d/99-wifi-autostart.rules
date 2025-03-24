@@ -1,0 +1,2 @@
+ACTION=="add", SUBSYSTEM=="net", KERNEL=="wl*", RUN+="/etc/wpa_supplicant/start_wpa_supplicant.sh %k"
+
