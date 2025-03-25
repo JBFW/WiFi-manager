@@ -1,4 +1,9 @@
 #!/usr/bin/perl
+
+# Changes:
+# 
+# use readdir instead 'wpa_cli interfaces'
+
 use strict;
 use warnings;
 use Gtk3 '-init';
@@ -7,6 +12,7 @@ use IPC::Open2;
 use Data::Dumper;
 
 my $wpa_cli = "/sbin/wpa_cli";
+my $ctl_dir = "/run/wpa_supplicant";
 
 my %networks;
 
@@ -66,13 +72,14 @@ sub run_wpa_cli {
 # Заполнение списка интерфейсов (A)
 sub load_interfaces {
   $list_A->get_model->clear;
-  my @interfaces = run_wpa_cli('interface');
-  foreach my $iface (@interfaces) {
-    next if($iface =~ /\w+\s+\w/);
-    $iface =~ s/\s+$//;
+  opendir(my $d, $ctl_dir);
+  while(my $str = readdir($d)){
+    next if ($str eq '.' || $str eq '..');
+    print "($str)\n";
     my $iter = $list_A->get_model->append();
-    $list_A->get_model->set($iter, 0 => $iface);
+    $list_A->get_model->set($iter, 0 => $str);
   }
+  closedir($d);
 }
 
 # Получение выбранного интерфейса
